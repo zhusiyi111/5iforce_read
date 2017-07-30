@@ -21,13 +21,12 @@ var timer = setInterval(function(){
 		}
 	})()
 
-
 	var img = $('.yaoqiu').find('img').eq(0).attr('src');
 	if(isOpened && img!==lastImg){
 		fillAnswer();
 		lastImg = img;
 	}
-})
+},200);
 
 
 var colorTimer = setInterval(function(){
@@ -39,45 +38,45 @@ var colorTimer = setInterval(function(){
 },200);
 
 function fillAnswer(){
-	var url = $('#workUrl').val(),	//搜索引擎
-		img = $('.yaoqiu').find('img').eq(0).attr('src'),	//图片
-		stepText = $('.yaoqiu').text();
 
-	//提取搜索关键字
-	var keyword = '';
-	try{
-		var text = stepText;
-		text = text.replace(/\s/g,'#');
-		text = text.replace(/((百度一下)|(输入关键词)|(搜索关键词)|(搜索)|(搜素)|(搜索#)|(输入))(:|：|\s|#)/g,'searchBegin');
-		text = text.match(/(searchBegin)[\u4e00-\u9fa5a-zA-Z0-9“”"]+/)[0];
-		keyword = text.replace(/searchBegin/g,"");
-	}catch(e){
 
-	}
+	var need = $('.yaoqiu').text().replace(/\s/g,''),
+		imgs = $('.yaoqiu img') || '',
+		lastRequest = $('.lastrequest').text().replace(/\s/g,''),
+		imgStr = [];
+
+	imgs.each(function(){
+		imgStr.push($(this).attr('src'));
+	})
+	imgStr = imgStr.join('');
+
+
+
+	I.ajax({
+		method:'getInfo',
+		data:{
+			need:need,
+			imgStr:imgStr,
+			lastRequest:lastRequest
+		},
+		success:function(data){
+			data = JSON.parse(data)[0];
+			console.log(data);
+			if(data){
+				if(data.adUrl){
+					$('#newadurl').val(data.adUrl);
+					openAd(data.website);
+				}
+				if(data.adText){
+					$('#cktext').val(data.adText)
+				}
+
+			}
+			
+		}
+	})
 
 	
-
-	chrome.runtime.sendMessage({
-		J_method:'getAnswer',
-		data:{
-			url:url,
-			img:img,
-			keyword:keyword
-		}
-	}, function(res) {
-		// 将当前信息存入localStorage
-		if(res){
-			setNowTask(res);
-			console.log(res);
-			// 填充答案
-			$('#newadurl').val(res.answer);
-
-
-			
-
-			// openAd(res);
-		}
-	});
 	setTimeout(function(){
 		$('#newadurl').trigger('click');
 	},8000);
@@ -87,18 +86,6 @@ function fillAnswer(){
 
 
 
-
-function setNowTask(data){
-	// localStorage只能存字符串
-	data = JSON.stringify(data);
-	chrome.runtime.sendMessage({
-		J_method:'setNowTask',
-		data:data
-	}, function(res) {
-
-	});
-}
-
 // 点过的变绿
 $(document).delegate('.zhuanclick','click',function(){
 	$(this).find('.title').css('color','green');
@@ -106,28 +93,21 @@ $(document).delegate('.zhuanclick','click',function(){
 })
 
 
-// 自动刷广告
-function openAd(res){
+// 新建标签
+function openAd(url){
 
-	// 重新聚焦
-	chrome.runtime.sendMessage({
-		J_method:'reFocus',
+
+	I.ajax({
+		method:'createTabThenClose',
 		data:{
-			delayTime:0
+			url:url,
+			delayTime:2000
+		},
+		success:function(data){
+
 		}
-	}, function(res) {
-		
 	})
 
-	// 打开新页面
-	var newWin = window.open('about:blank');
-	setTimeout(function(){
-		newWin.location.href = res.searchUrl;
-
-		setTimeout(function(){
-			newWin.close();
-		},17000);
-	},1023);
 }
 
 // 添加悬浮窗
@@ -178,15 +158,7 @@ function uploadCheckCode(){
 }  
 
 
-// 回填验证码
-function fillCheckCode(data){
-	$('#yzm').val(data.Result);
-	$('#checkCodeId').text(data.Id);
-	$('#TijiaoButton').trigger('click');
-
-}
-
-// 判断答案是否正确，如果不正确或为空，则关闭弹框
+// // 判断答案是否正确，如果不正确或为空，则关闭弹框
 var checkTimer = setInterval(function(){
 	var text = $('#content_url').text();
 	if( ( text==='提交网址或文字为空'||text==='验证网址不通过,请真实去点击广告') && !$('#content_url').is(':hidden') ){
@@ -196,7 +168,8 @@ var checkTimer = setInterval(function(){
 
 
 
-var loopClickTimer = setInterval(function(){console.log(cickItem)
+var loopClickTimer = setInterval(function(){
+
 	var flag = true;
 	// 弹窗必须是关闭的
 	if($('#newadurl').length>0 && !$('#newadurl').is(':hidden')){
@@ -205,10 +178,10 @@ var loopClickTimer = setInterval(function(){console.log(cickItem)
 	if(flag==false){
 		return;
 	}
-	var cickItem = $('.zhuanitem').filter(function(){
+	var clickItem = $('.zhuanitem').filter(function(){
 		var _this = $(this),
 			money = _this.find('.txtcg').text()
-		if( money>=80 || money<=70){
+		if( money<40 || money>100){
 			return false;
 		}
 		if(_this.find('.title').is('.clicked')){
@@ -217,8 +190,10 @@ var loopClickTimer = setInterval(function(){console.log(cickItem)
 		return true;
 	})
 
-	if(cickItem.length>0){
-		cickItem.eq(0).find('.zhuanclick').trigger('click');
+	console.log(clickItem)
+
+	if(clickItem.length>0){
+		clickItem.eq(0).find('.zhuanclick').trigger('click');
 	}else{
 		setTimeout(function(){
 			  window.location.reload();

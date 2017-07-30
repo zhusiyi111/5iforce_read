@@ -1,10 +1,10 @@
 {
-  "name": "5iads读数据端",
+  "name": "5iads强制读数据",
   "version": "0.0.1",
   "manifest_version": 2,
 
   // 简单描述
-  "description": "5iads读数据端",
+  "description": "5iads强制读数据",
   "icons": {
     "16": "icon.png",
     "48": "icon.png"
@@ -12,31 +12,19 @@
 
   // 浏览器小图表部分
   "browser_action": {
-    "default_title": "5iads读数据端",
+    "default_title": "5iads强制读数据",
     "default_icon": "icon.png",
     "default_popup": "pop.html"
   },
-  "background": { "scripts": ["static/jquery-1.8.1.js","js/background.js"] },
+  "background": { "scripts": ["static/jquery-1.8.1.js","static/Iquery.js","js/background.js"] },
   "content_scripts": [
     {
       "matches": ["http://www.5iads.cn/*"],
-      "js": ["static/jquery-1.8.1.js","js/publicInsert/index.js"]
-    },
-    {
-      "matches": ["https://www.baidu.com/*"],
-      "js": ["static/jquery-1.8.1.js","js/baidu/index.js"]
-    },
-    {
-      "matches": ["*://m.baidu.com/*"],
-      "js": ["static/jquery-1.8.1.js","js/mbaidu/index.js"]
+      "js": ["static/jquery-1.8.1.js","static/Iquery.js","js/publicInsert/index.js"]
     },
     {
       "matches": ["http://www.5iads.cn/zhuan.asp?zhuan=click"],
-      "js": ["static/jquery-1.8.1.js","js/clickAds/index.js"]
-    },
-    {
-      "matches": ["http://www.5iads.cn/zhuan.asp?zhuan=search"],
-      "js": ["static/jquery-1.8.1.js","js/searchAds/index.js"]
+      "js": ["static/jquery-1.8.1.js","static/Iquery.js","js/clickAds/index.js"]
     }
   ],
   "commands":{
