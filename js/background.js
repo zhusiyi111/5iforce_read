@@ -24,23 +24,3 @@ I.get('createTabThenClose',function(data,sender,sendResponse){
 	})
 })
 
-
-
-
-// chrome.commands.onCommand.addListener(function(cmd){
-// 	// 自动点击广告
-// 	if(cmd==='openAd'){
-// 		var task = JSON.parse(getNowTask());
-// 		console.log(task);
-
-// 		// 打开新页面
-// 		var newWin = window.open('about:blank');
-// 		setTimeout(function(){
-// 			newWin.location.href = task.searchUrl;
-
-// 			setTimeout(function(){
-// 				newWin.close();
-// 			},17000);
-// 		},1023);
-// 	}
-// })

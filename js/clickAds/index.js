@@ -77,9 +77,16 @@ function fillAnswer(){
 	})
 
 	
+
 	setTimeout(function(){
-		$('#newadurl').trigger('click');
-	},8000);
+		if($('#newadurl').val()===''){
+			$('#tasklist_dig').siblings('.ui-dialog-titlebar').find('.ui-dialog-titlebar-close').trigger('click');
+		}else{
+			setTimeout(function(){
+				$('#newadurl').trigger('click');
+			},8000);
+		}
+	},1000);
 
 
 }
@@ -158,6 +165,16 @@ function uploadCheckCode(){
 }  
 
 
+// 回填验证码
+function fillCheckCode(data){
+	$('#yzm').val(data.Result);
+	$('#checkCodeId').text(data.Id);
+	$('#TijiaoButton').trigger('click');
+
+}
+
+
+
 // // 判断答案是否正确，如果不正确或为空，则关闭弹框
 var checkTimer = setInterval(function(){
 	var text = $('#content_url').text();
@@ -181,7 +198,7 @@ var loopClickTimer = setInterval(function(){
 	var clickItem = $('.zhuanitem').filter(function(){
 		var _this = $(this),
 			money = _this.find('.txtcg').text()
-		if( money<40 || money>100){
+		if( money<40 || money>80){
 			return false;
 		}
 		if(_this.find('.title').is('.clicked')){
@@ -190,7 +207,6 @@ var loopClickTimer = setInterval(function(){
 		return true;
 	})
 
-	console.log(clickItem)
 
 	if(clickItem.length>0){
 		clickItem.eq(0).find('.zhuanclick').trigger('click');
